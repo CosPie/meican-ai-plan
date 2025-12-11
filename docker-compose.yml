@@ -17,4 +17,6 @@ services:
       - "8100:8100"
     environment:
       - PORT=8100
+    volumes:
+      - ./backend/data:/app/data
     restart: always
