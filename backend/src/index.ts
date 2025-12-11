@@ -9,6 +9,7 @@ import history from './routes/history';
 import menu from './routes/menu';
 import order from './routes/order';
 import ai from './routes/ai';
+import settings from './routes/settings';
 
 const app = new Hono();
 
@@ -67,6 +68,7 @@ app.route('/api/history', history);
 app.route('/api', menu);
 app.route('/api/orders', order);
 app.route('/api/ai', ai);
+app.route('/api/settings', settings);
 
 // ============================================================================
 // Server

@@ -29,7 +29,8 @@ const generateMockMenu = (restaurantName: string): Dish[] => {
 // Authentication API
 // ============================================================================
 
-const DEFAULT_PROXY_URL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8080';
+// Proxy URL is no longer used, we assume relative path /api or same origin
+const DEFAULT_BASE_URL = '';
 
 interface LoginResponse {
   success: boolean;
@@ -43,10 +44,9 @@ interface LoginResponse {
  */
 export const login = async (
   username: string,
-  password: string,
-  proxyUrl?: string
+  password: string
 ): Promise<LoginResponse> => {
-  const baseUrl = proxyUrl || DEFAULT_PROXY_URL;
+  const baseUrl = DEFAULT_BASE_URL;
   
   try {
     const response = await fetch(`${baseUrl}/api/auth/login`, {
@@ -74,7 +74,7 @@ export const login = async (
 export const logout = async (prefs: UserPreferences): Promise<boolean> => {
   if (!prefs.sessionId) return true;
   
-  const baseUrl = prefs.proxyUrl || DEFAULT_PROXY_URL;
+  const baseUrl = DEFAULT_BASE_URL;
   
   try {
     await fetch(`${baseUrl}/api/auth/logout`, {
@@ -97,7 +97,7 @@ export const logout = async (prefs: UserPreferences): Promise<boolean> => {
 export const checkAuthStatus = async (prefs: UserPreferences): Promise<boolean> => {
   if (!prefs.sessionId) return false;
   
-  const baseUrl = prefs.proxyUrl || DEFAULT_PROXY_URL;
+  const baseUrl = DEFAULT_BASE_URL;
   
   try {
     const response = await fetch(`${baseUrl}/api/auth/status`, {
@@ -130,8 +130,8 @@ interface ApiRequestOptions {
 const apiRequest = async <T>(options: ApiRequestOptions): Promise<T> => {
   const { method = 'GET', path, query, body, prefs } = options;
   
-  const baseUrl = prefs.proxyUrl || DEFAULT_PROXY_URL;
-  const url = new URL(path, baseUrl);
+  const baseUrl = DEFAULT_BASE_URL;
+  const url = new URL(path, window.location.origin); // Use window.location.origin as base for relative paths
   
   // Add query parameters
   if (query) {
@@ -751,5 +751,34 @@ export const fetchOrderHistory = async (
   } catch (e) {
     console.error('[MeicanService] History API Error:', e);
     throw e;
+  }
+};
+
+// ============================================================================
+// Settings API
+// ============================================================================
+
+export const getSettings = async (username: string): Promise<Partial<UserPreferences>> => {
+  try {
+    const response = await fetch(`/api/settings?username=${encodeURIComponent(username)}`);
+    if (!response.ok) return {};
+    return await response.json();
+  } catch (e) {
+    console.error('[MeicanService] Get Settings Error:', e);
+    return {};
+  }
+};
+
+export const saveSettings = async (username: string, settings: Partial<UserPreferences>): Promise<boolean> => {
+  try {
+    const response = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, settings })
+    });
+    return response.ok;
+  } catch (e) {
+    console.error('[MeicanService] Save Settings Error:', e);
+    return false;
   }
 };

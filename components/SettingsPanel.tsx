@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { UserPreferences } from '../types';
 import { savePreferences } from '../services/db';
 import { useLogin, useLogout, useCalendarStatus, useUserAddresses, Address } from '../hooks/useMeican';
+import { getSettings, saveSettings } from '../services/meicanService';
 
 interface Props {
   initialPrefs: UserPreferences;
@@ -92,13 +93,19 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
     try {
       const result = await loginMutation.mutateAsync({
         username: formData.username,
-        password: formData.password,
-        proxyUrl: formData.proxyUrl
+        password: formData.password
       });
 
       if (result.success && result.sessionId) {
         // Update form data with sessionId
-        const updatedPrefs = { ...formData, sessionId: result.sessionId };
+        let updatedPrefs = { ...formData, sessionId: result.sessionId };
+        
+        // Fetch settings from backend
+        const backendSettings = await getSettings(formData.username);
+        if (backendSettings) {
+          updatedPrefs = { ...updatedPrefs, ...backendSettings };
+        }
+
         setFormData(updatedPrefs);
         
         // Persist to IndexedDB immediately
@@ -129,6 +136,9 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
 
   const handleSave = async () => {
     await savePreferences(formData);
+    if (formData.username) {
+      await saveSettings(formData.username, formData);
+    }
     onSave(formData);
     onClose();
   };
@@ -201,17 +211,7 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
               
               {!formData.useMockData && (
                 <>
-                  {/* Proxy URL */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.proxyUrl')}</label>
-                    <input 
-                      type="text"
-                      value={formData.proxyUrl}
-                      onChange={(e) => handleChange('proxyUrl', e.target.value)}
-                      className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
-                      placeholder="http://localhost:8080"
-                    />
-                  </div>
+
 
                   {/* Login Status */}
                   {isLoggedIn ? (

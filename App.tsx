@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { UserPreferences, DailyStatus, OrderStatus } from './types';
 import { getPreferences, savePreferences } from './services/db';
 import { useCalendarStatus, useLogout } from './hooks/useMeican';
+import { getSettings } from './services/meicanService';
 import SettingsPanel from './components/SettingsPanel';
 import Planner from './components/Planner';
 import AnalysisPanel from './components/AnalysisPanel';
@@ -74,8 +75,24 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Initial Load
-    getPreferences().then(stored => {
-      setPrefs(stored || DEFAULT_PREFS);
+    getPreferences().then(async (stored) => {
+      let initial = stored || DEFAULT_PREFS;
+      
+      // If logged in, fetch latest settings from backend
+      if (initial.sessionId && initial.username) {
+        try {
+          const backendSettings = await getSettings(initial.username);
+          if (backendSettings) {
+            initial = { ...initial, ...backendSettings };
+            // Update local storage with latest backend settings
+            await savePreferences(initial);
+          }
+        } catch (e) {
+          console.error('Failed to sync settings:', e);
+        }
+      }
+      
+      setPrefs(initial);
     });
   }, []);
 

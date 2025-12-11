@@ -15,13 +15,7 @@ const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
   const [username, setUsername] = useState(initialPrefs.username || '');
   const [password, setPassword] = useState(initialPrefs.password || '');
   
-  const [proxyUrl, setProxyUrl] = useState(() => {
-    if (initialPrefs.proxyUrl) return initialPrefs.proxyUrl;
-    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-      return `http://${window.location.hostname}:8080`;
-    }
-    return '';
-  });
+
   
   const [aiProvider, setAiProvider] = useState<'gemini' | 'custom'>(initialPrefs.aiProvider || 'gemini');
 
@@ -41,7 +35,7 @@ const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
       const result = await loginMutation.mutateAsync({
         username,
         password,
-        proxyUrl // Use the state variable
+
       });
 
       if (result.success && result.sessionId) {
@@ -50,7 +44,7 @@ const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
           username, 
           password, 
           sessionId: result.sessionId,
-          proxyUrl,
+
           aiProvider
         };
         await savePreferences(updatedPrefs);
@@ -157,18 +151,6 @@ const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
                 />
              </div>
 
-             {typeof window !== 'undefined' && window.location.hostname !== 'localhost' && (
-               <>
-                 <div className="relative group">
-                    <input
-                      type="text"
-                      value={proxyUrl}
-                      onChange={(e) => setProxyUrl(e.target.value)}
-                      placeholder={t('login.proxyPlaceholder')}
-                      className="w-full bg-[#252525] border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] transition-all"
-                    />
-                 </div>
-                 
                  <div className="relative group">
                     <div className="relative">
                       <select
@@ -184,8 +166,6 @@ const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
                       </div>
                     </div>
                  </div>
-               </>
-             )}
           </div>
 
           <div className="flex items-center justify-between pt-4">
