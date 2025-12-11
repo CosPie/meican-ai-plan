@@ -84,9 +84,12 @@ console.log(`
 ╚══════════════════════════════════════════════════════════════╝
 `);
 
-serve({
-  fetch: app.fetch,
-  port,
-});
+// Check if running in Bun to avoid double server start (Bun auto-starts on default export)
+if (!process.versions['bun']) {
+  serve({
+    fetch: app.fetch,
+    port,
+  });
+}
 
 export default app;
