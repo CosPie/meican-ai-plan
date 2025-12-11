@@ -758,9 +758,17 @@ export const fetchOrderHistory = async (
 // Settings API
 // ============================================================================
 
-export const getSettings = async (username: string): Promise<Partial<UserPreferences>> => {
+export const getSettings = async (username: string, sessionId?: string): Promise<Partial<UserPreferences>> => {
   try {
-    const response = await fetch(`/api/settings?username=${encodeURIComponent(username)}`);
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (sessionId) {
+      headers['X-Session-Id'] = sessionId;
+    }
+    
+    const response = await fetch(`/api/settings?username=${encodeURIComponent(username)}`, {
+      headers
+    });
+    
     if (!response.ok) return {};
     return await response.json();
   } catch (e) {

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { UserPreferences } from '../types';
 import { useLogin } from '../hooks/useMeican';
 import { savePreferences } from '../services/db';
+import { getSettings } from '../services/meicanService';
 
 interface Props {
   initialPrefs: UserPreferences;
@@ -39,7 +40,7 @@ const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
       });
 
       if (result.success && result.sessionId) {
-        const updatedPrefs = { 
+        let updatedPrefs = { 
           ...initialPrefs, 
           username, 
           password, 
@@ -47,6 +48,17 @@ const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
 
           aiProvider
         };
+
+        // Fetch settings from backend
+        try {
+          const backendSettings = await getSettings(username, result.sessionId);
+          if (backendSettings) {
+             updatedPrefs = { ...updatedPrefs, ...backendSettings };
+          }
+        } catch (e) {
+          console.error('Failed to fetch settings on login:', e);
+        }
+
         await savePreferences(updatedPrefs);
         onLoginSuccess(updatedPrefs);
       } else {

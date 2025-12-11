@@ -81,7 +81,7 @@ const App: React.FC = () => {
       // If logged in, fetch latest settings from backend
       if (initial.sessionId && initial.username) {
         try {
-          const backendSettings = await getSettings(initial.username);
+          const backendSettings = await getSettings(initial.username, initial.sessionId);
           if (backendSettings) {
             initial = { ...initial, ...backendSettings };
             // Update local storage with latest backend settings
