@@ -19,13 +19,19 @@ COPY . .
 RUN bun run build
 
 # Stage 2: Serve with Nginx
-FROM nginx:alpine
+# Stage 2: Serve with Nginx
+FROM alpine:latest
+
+# Install Nginx and Zstd module
+RUN apk add --no-cache nginx nginx-mod-http-zstd && \
+    mkdir -p /run/nginx && \
+    sed -i '1i load_module /usr/lib/nginx/modules/ngx_http_zstd_filter_module.so;' /etc/nginx/nginx.conf
 
 # Copy the build output to Nginx's html directory
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy custom Nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/http.d/default.conf
 
 EXPOSE 80
 
