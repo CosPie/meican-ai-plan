@@ -1,20 +1,18 @@
-FROM node:20-alpine
+FROM oven/bun:1-alpine
 
 WORKDIR /app
 
 # Copy package.json and bun.lockb (or package-lock.json)
 COPY package.json ./
+COPY bun.lockb ./
 
 # Install dependencies
-RUN npm install
+RUN bun install --frozen-lockfile
 
 COPY . .
-
-# Build the application
-RUN npm run build
 
 # Expose the port the app runs on
 EXPOSE 8100
 
 # Command to run the application
-CMD ["npm", "start"]
+CMD ["bun", "src/index.ts"]

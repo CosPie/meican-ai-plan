@@ -1,5 +1,6 @@
 # Stage 1: Build the React application
-FROM node:20-alpine as builder
+# Stage 1: Build the React application
+FROM oven/bun:1-alpine as builder
 
 WORKDIR /app
 
@@ -10,11 +11,12 @@ COPY package.json ./
 # Since the user has bun.lockb, it's best to use bun or just npm install if compatible.
 # Let's stick to npm for broader compatibility unless bun is strictly required. 
 # The package.json has no specific engine requirement.
-RUN npm install
+COPY bun.lockb ./
+RUN bun install --frozen-lockfile
 
 COPY . .
 
-RUN npm run build
+RUN bun run build
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine
