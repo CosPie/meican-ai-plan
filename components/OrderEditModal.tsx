@@ -195,7 +195,7 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className="bg-[#252525] rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-white/10 overflow-hidden"
+        className="bg-[#252525] rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-white/10 overflow-hidden mx-4 md:mx-0"
       >
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-white/10">
@@ -338,11 +338,11 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
                       }`}
                     >
                       <div className="flex justify-between items-center">
-                        <div>
-                          <p className={`font-medium ${selectedDish?.id === dish.id ? 'text-[#6FB92D]' : ''}`}>
-                            {dish.name}
-                          </p>
-                        </div>
+                          <div>
+                            <p className={`font-medium ${selectedDish?.id === dish.id ? 'text-[#6FB92D]' : ''} line-clamp-2`}>
+                              {dish.name}
+                            </p>
+                          </div>
                         <div className="flex items-center gap-3">
                           <span className="font-mono text-white">
                             ¥{(dish.priceInCent / 100).toFixed(2)}
@@ -363,25 +363,25 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-white/10 flex justify-between items-center bg-[#1e1e1e]">
-          <div>
+        <div className="p-4 md:p-6 border-t border-white/10 flex flex-col-reverse sm:flex-row justify-between items-center bg-[#1e1e1e] gap-4 sm:gap-0">
+          <div className="w-full sm:w-auto text-center sm:text-left">
             {selectedDish && (
               <p className="text-sm text-gray-400">
                 {t('orderEdit.selected')}: <span className="text-[#6FB92D] font-medium">{selectedDish.name}</span>
               </p>
             )}
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="px-6 py-2.5 text-gray-400 hover:text-white hover:bg-[#333] rounded-full transition-colors font-medium"
+              className="flex-1 sm:flex-none px-6 py-2.5 text-gray-400 hover:text-white hover:bg-[#333] rounded-full transition-colors font-medium"
             >
               {t('app.cancel')}
             </button>
             <button
               onClick={handleOrder}
               disabled={!selectedDish || isActionLoading}
-              className="px-6 py-2.5 bg-[#6FB92D] hover:bg-[#5da025] text-white rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all flex items-center gap-2"
+              className="flex-1 sm:flex-none px-6 py-2.5 bg-[#6FB92D] hover:bg-[#5da025] text-white rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all flex items-center justify-center gap-2"
             >
               {placeOrderMutation.isPending ? (
                 <>

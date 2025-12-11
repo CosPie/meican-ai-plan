@@ -143,7 +143,7 @@ const App: React.FC = () => {
               transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.3 }}
               className="fixed top-0 w-full z-20 glass-panel border-b-0 shadow-lg shadow-black/20"
             >
-              <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+              <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <motion.div 
                     whileHover={{ rotate: 10, scale: 1.1 }}
@@ -151,7 +151,7 @@ const App: React.FC = () => {
                   >
                     M
                   </motion.div>
-                  <h1 className="text-xl font-bold tracking-tight">{t('app.title', { highlight: 'AI' }).split('AI')[0]}<span className="text-[#6FB92D]">AI</span>{t('app.title', { highlight: 'AI' }).split('AI')[1]}</h1>
+                  <h1 className="text-lg md:text-xl font-bold tracking-tight">{t('app.title', { highlight: 'AI' }).split('AI')[0]}<span className="text-[#6FB92D]">AI</span>{t('app.title', { highlight: 'AI' }).split('AI')[1]}</h1>
                 </div>
                 <div className="flex items-center space-x-6">
                   <button 
@@ -159,14 +159,14 @@ const App: React.FC = () => {
                     className="text-sm font-medium text-gray-400 hover:text-[#6FB92D] transition-colors flex items-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                    {t('app.analysis')}
+                    <span className="hidden sm:inline">{t('app.analysis')}</span>
                   </button>
                   <button 
                     onClick={() => setShowSettings(true)}
                     className="text-sm font-medium text-gray-400 hover:text-[#6FB92D] transition-colors flex items-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    {t('app.settings')}
+                    <span className="hidden sm:inline">{t('app.settings')}</span>
                   </button>
                   <div className="relative group">
                     <motion.button 
@@ -210,10 +210,10 @@ const App: React.FC = () => {
             </motion.header>
 
             {/* Main Content */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-10 md:py-28">
               
               {/* Controls */}
-              <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-6">
+              <div className="flex flex-col sm:flex-row justify-between items-center mb-6 md:mb-10 gap-4 md:gap-6">
                 <motion.div 
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}

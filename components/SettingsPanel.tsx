@@ -159,7 +159,7 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
          animate={{ scale: 1, y: 0 }}
          exit={{ scale: 0.9, y: 20 }}
          transition={{ type: "spring", stiffness: 300, damping: 25 }}
-         className="bg-[#252525] rounded-3xl shadow-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/10"
+         className="bg-[#252525] rounded-3xl shadow-2xl p-4 md:p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/10"
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-white">{t('settings.title')}</h2>
@@ -434,7 +434,7 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.vendorWeights')}</label>
-                <div className="flex space-x-2 mt-1 mb-3">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-1 mb-3">
                   <input 
                     placeholder={t('settings.restaurantName')}
                     value={newVendor}
@@ -470,9 +470,9 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
           </div>
         </div>
 
-        <div className="mt-8 flex justify-end space-x-4">
-          <button onClick={onClose} className="px-6 py-2.5 rounded-full text-gray-400 hover:bg-[#333] transition-colors font-medium">{t('settings.cancel')}</button>
-          <button onClick={handleSave} className="px-8 py-2.5 bg-[#6FB92D] text-white rounded-full hover:bg-[#5da025] shadow-lg shadow-[#6FB92D]/20 transition-all font-medium">{t('settings.save')}</button>
+        <div className="mt-8 flex flex-col-reverse sm:flex-row justify-end gap-4 sm:space-x-4">
+          <button onClick={onClose} className="w-full sm:w-auto px-6 py-2.5 rounded-full text-gray-400 hover:bg-[#333] transition-colors font-medium">{t('settings.cancel')}</button>
+          <button onClick={handleSave} className="w-full sm:w-auto px-8 py-2.5 bg-[#6FB92D] text-white rounded-full hover:bg-[#5da025] shadow-lg shadow-[#6FB92D]/20 transition-all font-medium">{t('settings.save')}</button>
         </div>
       </motion.div>
     </motion.div>

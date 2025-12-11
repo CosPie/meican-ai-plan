@@ -400,7 +400,7 @@ const Planner: React.FC<Props> = ({ weekStatus, prefs, onUpdatePrefs, onOrdersPl
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className="bg-[#252525] rounded-3xl shadow-2xl p-8 w-full max-w-3xl max-h-[90vh] flex flex-col border border-white/10"
+        className="bg-[#252525] rounded-3xl shadow-2xl p-4 md:p-8 w-full max-w-3xl max-h-[90vh] flex flex-col border border-white/10"
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-white flex items-center">
@@ -647,7 +647,7 @@ const Planner: React.FC<Props> = ({ weekStatus, prefs, onUpdatePrefs, onOrdersPl
               </div>
               <div className="grid grid-cols-1 gap-4">
                 {plan.map((item, idx) => (
-                  <div key={idx} className="bg-[#2A2A2A] border border-[#333] rounded-2xl p-5 flex justify-between items-start hover:border-[#6FB92D]/40 transition-all group shadow-sm">
+                  <div key={idx} className="bg-[#2A2A2A] border border-[#333] rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row justify-between items-start hover:border-[#6FB92D]/40 transition-all group shadow-sm gap-4 sm:gap-0">
                     <div>
                       <div className="flex items-center space-x-3 mb-2">
                         <span className="font-bold text-white bg-[#333] px-3 py-1 rounded-lg text-sm">{item.date}</span>
@@ -662,7 +662,7 @@ const Planner: React.FC<Props> = ({ weekStatus, prefs, onUpdatePrefs, onOrdersPl
                         {item.reason}
                       </p>
                     </div>
-                    <div className="flex flex-col items-end space-y-3">
+                    <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto space-x-4 sm:space-x-0 sm:space-y-3">
                       <span className="font-mono text-xl text-white">¥{(item.dish.priceInCent / 100).toFixed(2)}</span>
                       <button 
                         onClick={() => removePlanItem(idx)}
@@ -723,11 +723,11 @@ const Planner: React.FC<Props> = ({ weekStatus, prefs, onUpdatePrefs, onOrdersPl
 
         {/* FOOTER ACTIONS - Only for Review Step */}
         {step === 'review' && (
-             <div className="mt-8 pt-4 border-t border-white/5 flex justify-end space-x-4">
-               <button onClick={startPlanning} className="px-6 py-2.5 text-gray-400 hover:text-white hover:bg-[#333] rounded-full transition-colors font-medium">{t('planner.regenerate')}</button>
+             <div className="mt-8 pt-4 border-t border-white/5 flex flex-col-reverse sm:flex-row justify-end gap-4 sm:space-x-4">
+               <button onClick={startPlanning} className="w-full sm:w-auto px-6 py-2.5 text-gray-400 hover:text-white hover:bg-[#333] rounded-full transition-colors font-medium">{t('planner.regenerate')}</button>
                <button 
                  onClick={executeOrder} 
-                 className="px-8 py-2.5 bg-white text-black rounded-full shadow hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-colors"
+                 className="w-full sm:w-auto px-8 py-2.5 bg-white text-black rounded-full shadow hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-colors"
                  disabled={plan.length === 0}
                >
                   {t('planner.confirmAndPlace')}

@@ -50,11 +50,11 @@ const AnalysisPanel: React.FC<Props> = ({ prefs, onClose }) => {
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
       className="fixed inset-0 bg-[#181818] z-40 overflow-y-auto custom-scrollbar"
     >
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-12">
         <div className="flex justify-between items-center mb-10">
           <div>
             <div className="flex items-end gap-4">
-              <h1 className="text-4xl font-bold text-white tracking-tight">{t('analysis.titlePrefix')} <span className="text-[#6FB92D]">{t('analysis.titleSuffix')}</span></h1>
+              <h1 className="text-2xl md:text-4xl font-bold text-white tracking-tight">{t('analysis.titlePrefix')} <span className="text-[#6FB92D]">{t('analysis.titleSuffix')}</span></h1>
               {result?.modelName && (
                 <span className="px-2 py-1 rounded-md bg-[#333] border border-[#444] text-xs text-gray-400 mb-1 font-mono">
                   {result.modelName}
@@ -63,7 +63,7 @@ const AnalysisPanel: React.FC<Props> = ({ prefs, onClose }) => {
             </div>
             <p className="text-gray-400 mt-2 text-lg">{t('analysis.subtitle', { count: history.length })}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white hover:bg-[#252525] px-6 py-3 rounded-full border border-transparent hover:border-[#333] transition-all">{t('analysis.backToDashboard')}</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-white hover:bg-[#252525] px-4 md:px-6 py-2 md:py-3 rounded-full border border-transparent hover:border-[#333] transition-all text-sm md:text-base">{t('analysis.backToDashboard')}</button>
         </div>
 
         {historyLoading && (
@@ -100,7 +100,7 @@ const AnalysisPanel: React.FC<Props> = ({ prefs, onClose }) => {
         )}
 
         {result && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 animate-fade-in">
             {/* Health Score Card */}
             <div className="bg-[#252525] p-8 rounded-3xl shadow-lg border border-white/5 col-span-1 md:col-span-2 flex items-center relative overflow-hidden group">
                <div className="absolute right-0 top-0 w-64 h-64 bg-[#6FB92D] opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 group-hover:opacity-10 transition-opacity"></div>
