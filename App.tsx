@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { formatDate } from './utils/dateUtils';
 import { useTranslation } from 'react-i18next';
 import { UserPreferences, DailyStatus, OrderStatus } from './types';
 import { getPreferences, savePreferences } from './services/db';
@@ -43,7 +44,13 @@ const App: React.FC = () => {
   const [editingSlot, setEditingSlot] = useState<DailyStatus | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const logoutMutation = useLogout();
-  const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
+    const d = new Date();
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+    d.setDate(diff);
+    return d;
+  });
 
   // Calculate start and end dates for the current week
   const getWeekRange = (baseDate: Date) => {
@@ -54,7 +61,10 @@ const App: React.FC = () => {
     start.setDate(diff);
     
     const end = new Date(start);
-    end.setDate(end.getDate() + 6);
+    // If weekends are enabled, show until Sunday (6 days after Monday)
+    // If weekends are disabled, show until Friday (4 days after Monday)
+    const daysToAdd = prefs?.enableWeekends ? 6 : 4;
+    end.setDate(end.getDate() + daysToAdd);
     return { start, end };
   };
 
@@ -267,10 +277,10 @@ const App: React.FC = () => {
                    const day = d.getDay();
                    const diff = d.getDate() - day + (day === 0 ? -6 : 1) + idx;
                    d.setDate(diff);
-                   const dateStr = d.toISOString().split('T')[0];
+                   const dateStr = formatDate(d);
                    
                    const dayItems = weekStatus.filter(w => w.date === dateStr);
-                   const isToday = new Date().toISOString().split('T')[0] === dateStr;
+                   const isToday = formatDate(new Date()) === dateStr;
                    
                    // Define meals based on preferences
                    const mealsToShow = [];

@@ -1,4 +1,5 @@
 import { DailyStatus, Dish, HistoricalOrder, MealTime, OrderStatus, UserPreferences } from '../types';
+import { formatDate } from '../utils/dateUtils';
 
 // ============================================================================
 // Mock Data (for development/testing)
@@ -253,7 +254,7 @@ export const getCalendarStatus = async (
     const days: DailyStatus[] = [];
     const curr = new Date(startDate);
     while (curr <= endDate) {
-      const dateStr = curr.toISOString().split('T')[0];
+      const dateStr = formatDate(curr);
       const dayOfWeek = curr.getDay();
       if (dayOfWeek !== 0 && dayOfWeek !== 6) {
         days.push({
@@ -277,8 +278,8 @@ export const getCalendarStatus = async (
 
   // Real API call
   try {
-    const beginDate = startDate.toISOString().split('T')[0];
-    const endDateStr = endDate.toISOString().split('T')[0];
+    const beginDate = formatDate(startDate);
+    const endDateStr = formatDate(endDate);
 
     const response = await apiRequest<CalendarResponse>({
       method: 'GET',
@@ -715,7 +716,7 @@ export const fetchOrderHistory = async (
     const mockOrders: Omit<HistoricalOrder, 'id'>[] = [];
     const curr = new Date(startDate);
     while (curr <= endDate) {
-      const dateStr = curr.toISOString().split('T')[0];
+      const dateStr = formatDate(curr);
       const dayOfWeek = curr.getDay();
       if (dayOfWeek !== 0 && dayOfWeek !== 6) {
         mockOrders.push({
@@ -733,8 +734,8 @@ export const fetchOrderHistory = async (
 
   // Real API call
   try {
-    const beginDate = startDate.toISOString().split('T')[0];
-    const endDateStr = endDate.toISOString().split('T')[0];
+    const beginDate = formatDate(startDate);
+    const endDateStr = formatDate(endDate);
 
     const response = await apiRequest<HistoryResponse>({
       method: 'GET',
