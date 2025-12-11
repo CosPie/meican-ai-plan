@@ -11,7 +11,7 @@ interface Props {
 }
 
 const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [username, setUsername] = useState(initialPrefs.username || '');
   const [password, setPassword] = useState(initialPrefs.password || '');
   
@@ -63,6 +63,11 @@ const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
     }
   };
 
+  const toggleLanguage = () => {
+    const newLang = i18n.language.startsWith('zh') ? 'en' : 'zh';
+    i18n.changeLanguage(newLang);
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#181818] text-white">
       {/* Background Elements */}
@@ -75,6 +80,24 @@ const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#6FB92D] rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-blue-500 rounded-full blur-[100px]" />
       </motion.div>
+
+      {/* Language Toggle */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        onClick={toggleLanguage}
+        className="absolute top-6 right-6 z-20 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm text-white transition-all flex items-center gap-2 group"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <svg className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.204 12.596a12.097 12.097 0 01-5.78 5.78m5.78-5.78l-2.5-2.5m2.5 2.5l2.5 2.5m-5.78-5.78l2.5-2.5m-2.5 2.5A12.097 12.097 0 013 15m18 0V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2z" />
+        </svg>
+        <span className="text-sm font-medium text-gray-300 group-hover:text-white">
+          {i18n.language.startsWith('zh') ? 'English' : '中文'}
+        </span>
+      </motion.button>
 
       {/* Main Content */}
       <div className="z-10 flex flex-col items-center w-full max-w-md px-6">
