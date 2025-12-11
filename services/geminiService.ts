@@ -2,10 +2,22 @@ import { GoogleGenAI } from '@google/genai';
 import { Dish, HistoricalOrder, UserPreferences, AnalysisResult, PlannedOrder, MealTime } from '../types';
 
 export class GeminiService {
-  private genAI: GoogleGenAI;
+  private genAI: GoogleGenAI | undefined;
 
   constructor() {
-    this.genAI = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    if (process.env.API_KEY) {
+      this.genAI = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    }
+  }
+
+  private getGenAI(apiKey?: string): GoogleGenAI {
+    if (apiKey) {
+      return new GoogleGenAI({ apiKey });
+    }
+    if (this.genAI) {
+      return this.genAI;
+    }
+    throw new Error("Gemini API Key is missing. Please set it in Settings or environment variables.");
   }
 
   // Common method to send request to Custom AI via Backend Proxy
@@ -108,9 +120,8 @@ export class GeminiService {
         rawText = await this.callCustomAI(prompt + "\n\nEnsure you return ONLY valid JSON. Keys must be double quoted.", prefs);
       } else {
         // Prepare Gemini Client (Use user provided key if available, else generic)
-        const activeGenAI = prefs.geminiApiKey 
-          ? new GoogleGenAI({ apiKey: prefs.geminiApiKey })
-          : this.genAI;
+        // Prepare Gemini Client (Use user provided key if available, else generic)
+        const activeGenAI = this.getGenAI(prefs.geminiApiKey);
 
         const model = 'gemini-2.5-flash';
         const response = await activeGenAI.models.generateContent({
@@ -229,9 +240,7 @@ export class GeminiService {
       if (prefs && prefs.aiProvider === 'custom') {
          rawText = await this.callCustomAI(prompt, prefs);
       } else {
-        const activeGenAI = (prefs && prefs.geminiApiKey)
-          ? new GoogleGenAI({ apiKey: prefs.geminiApiKey })
-          : this.genAI;
+        const activeGenAI = this.getGenAI(prefs?.geminiApiKey);
 
         const response = await activeGenAI.models.generateContent({
           model: 'gemini-2.5-flash',
