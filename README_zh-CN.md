@@ -95,5 +95,5 @@ bun dev
 ---
 
 <p align="center">
-  由 <a href="https://github.com/yourusername">Your Name</a> 用 ❤️ 制作
+  由 <a href="https://github.com/yourusername">CosPie</a> 用 ❤️ 制作
 </p>
