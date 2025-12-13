@@ -93,6 +93,17 @@ const App: React.FC = () => {
       }
       
       setPrefs(initial);
+
+      // Auto-switch to next week if weekends are disabled and today is Saturday/Sunday
+      if (!initial.enableWeekends) {
+        const today = new Date();
+        const day = today.getDay();
+        if (day === 0 || day === 6) {
+          const nextWeek = new Date(currentWeekStart);
+          nextWeek.setDate(nextWeek.getDate() + 7);
+          setCurrentWeekStart(nextWeek);
+        }
+      }
     });
   }, []);
 
