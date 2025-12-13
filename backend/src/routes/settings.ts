@@ -58,7 +58,12 @@ settings.get('/', async (c) => {
 
   const allSettings = await readSettings();
   const userSettings = allSettings[username] || {};
-  return c.json(userSettings);
+  
+  // Exclude sessionId from response to prevent overwriting frontend session with stale data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { sessionId, ...safeSettings } = userSettings;
+  
+  return c.json(safeSettings);
 });
 
 settings.post('/', async (c) => {
@@ -69,8 +74,12 @@ settings.post('/', async (c) => {
     return c.json({ error: 'Username and settings required' }, 400);
   }
 
+  // Exclude sessionId from being saved
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { sessionId, ...settingsToSave } = newSettings;
+
   const allSettings = await readSettings();
-  allSettings[username] = { ...(allSettings[username] || {}), ...newSettings };
+  allSettings[username] = { ...(allSettings[username] || {}), ...settingsToSave };
   
   await writeSettings(allSettings);
   return c.json({ success: true });
