@@ -7,7 +7,7 @@ const auth = new Hono();
 const MEICAN_BASE_URL = 'https://meican.com';
 
 // File-based session storage for persistence across restarts
-const SESSIONS_FILE = path.join(process.cwd(), '.sessions.json');
+const SESSIONS_FILE = path.join(process.cwd(), 'data', '.sessions.json');
 
 interface SessionData {
   cookies: string;

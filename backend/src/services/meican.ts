@@ -79,8 +79,17 @@ export class MeicanService {
         throw new Error(`Meican API error: ${response.status} ${response.statusText}`);
       }
 
-      const data = await response.json();
-      return data as T;
+      const text = await response.text();
+      try {
+        const data = JSON.parse(text);
+        return data as T;
+      } catch (e) {
+        console.error(`[MeicanService] JSON Parse Error: ${e}`);
+        console.error(`[MeicanService] Response Status: ${response.status}`);
+        console.error(`[MeicanService] Response Headers:`, Object.fromEntries(response.headers.entries()));
+        console.error(`[MeicanService] Response Body Preview: ${text.substring(0, 500)}`);
+        throw new Error(`Meican API returned invalid JSON: ${response.status} ${response.statusText}`);
+      }
     } catch (error) {
       console.error('[MeicanService] Request failed:', error);
       throw error;
