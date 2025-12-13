@@ -355,6 +355,11 @@ const Planner: React.FC<Props> = ({ weekStatus, prefs, onUpdatePrefs, onOrdersPl
         if (item.mealTime === 'BREAKFAST') targetTime = "07:00";
         if (item.mealTime === 'DINNER') targetTime = "12:00";
 
+        // Add delay to prevent rate limiting (1.5s)
+        if (results.length > 0) {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+
         await placeOrder(item.tabUniqueId, item.dish.id, `${item.date} ${targetTime}`, prefs, addressIdToUse);
         addLog(t('planner.orderSuccess', { date: item.date }));
       } catch (e: any) {

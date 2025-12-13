@@ -656,7 +656,7 @@ export const placeOrder = async (
     }
   } catch (e) {
     console.error('[MeicanService] Order API Error:', e);
-    return { success: false };
+    throw e;
   }
 };
 
