@@ -490,7 +490,7 @@ const Planner: React.FC<Props> = ({ weekStatus, prefs, onUpdatePrefs, onOrdersPl
                           onChange={(e) => setConfigForm(prev => ({ ...prev, aiProvider: e.target.value as any }))}
                           className="w-full rounded-lg border border-[#444] bg-[#252525] p-2.5 text-white focus:border-[#6FB92D] outline-none"
                         >
-                          <option value="gemini">{t('settings.geminiDefault')}</option>
+                          <option value="gemini">{t('settings.geminiModel')}</option>
                           <option value="custom">{t('settings.customAi')}</option>
                         </select>
                      </div>

@@ -339,7 +339,7 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
                   onChange={(e) => handleChange('aiProvider', e.target.value)}
                   className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
                 >
-                  <option value="gemini">{t('settings.geminiDefault')}</option>
+                  <option value="gemini">{t('settings.geminiModel')}</option>
                   <option value="openrouter">OpenRouter (Free)</option>
                   <option value="custom">{t('settings.customAi')}</option>
                 </select>

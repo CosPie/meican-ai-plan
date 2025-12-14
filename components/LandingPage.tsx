@@ -18,7 +18,7 @@ const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
   
 
   
-  const [aiProvider, setAiProvider] = useState<'gemini' | 'custom'>(initialPrefs.aiProvider || 'gemini');
+  const [aiProvider, setAiProvider] = useState<'gemini' | 'custom' | 'openrouter'>(initialPrefs.aiProvider || 'openrouter');
 
   const [error, setError] = useState('');
   const loginMutation = useLogin();
@@ -167,10 +167,11 @@ const LandingPage: React.FC<Props> = ({ initialPrefs, onLoginSuccess }) => {
                     <div className="relative">
                       <select
                         value={aiProvider}
-                        onChange={(e) => setAiProvider(e.target.value as 'gemini' | 'custom')}
+                        onChange={(e) => setAiProvider(e.target.value as 'gemini' | 'custom' | 'openrouter')}
                         className="w-full bg-[#252525] border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] transition-all appearance-none cursor-pointer"
                       >
-                        <option value="gemini">{t('settings.geminiDefault').replace(' (Default)', '')} ({t('settings.default')})</option>
+                        <option value="openrouter">OpenRouter ({t('settings.default')})</option>
+                        <option value="gemini">{t('settings.geminiModel')}</option>
                         <option value="custom">{t('settings.customAi')}</option>
                       </select>
                       <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">

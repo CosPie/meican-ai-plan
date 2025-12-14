@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "bun run build && node deploy.js"
+    "deploy": "bun run build && node deploy.js && node deploy-backend.js"
   },
   "dependencies": {
     "@google/genai": "^1.32.0",
