@@ -21,7 +21,7 @@ const DEFAULT_PREFS: UserPreferences = {
   excludedKeywords: [],
   vendorWeights: {},
   planningMode: 'balanced',
-  aiProvider: 'gemini',
+  aiProvider: 'openrouter',
   geminiApiKey: '',
   customAiBaseUrl: '',
   customAiApiKey: '',
