@@ -78,7 +78,7 @@ app.route('/api/settings', settings);
 // Server
 // ============================================================================
 
-const port = parseInt(process.env.PORT || '8080', 10);
+const port = parseInt(process.env.PORT || '8180', 10);
 
 console.log(`
 ╔══════════════════════════════════════════════════════════════╗

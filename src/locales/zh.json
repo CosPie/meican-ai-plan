@@ -42,7 +42,7 @@
         "subtitle2": "自动规划餐食，优化健康，简化午休时光。",
         "usernamePlaceholder": "邮箱 / 用户名",
         "passwordPlaceholder": "密码",
-        "proxyPlaceholder": "代理地址 (例如 http://192.168.1.5:8080)"
+        "proxyPlaceholder": "代理地址 (例如 http://192.168.1.5:8180)"
     },
     "orderEdit": {
         "deadlinePassed": "修改时间已截止",

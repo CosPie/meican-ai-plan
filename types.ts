@@ -15,7 +15,7 @@ export interface UserPreferences {
   username: string;
   password: string;
   sessionId: string; // Obtained after login
-  proxyUrl: string; // e.g., http://localhost:8080/
+  proxyUrl: string; // e.g., http://localhost:8180/
   useMockData: boolean;
   excludedKeywords: string[]; // e.g. ["peanuts", "spicy"]
   vendorWeights: Record<string, number>; // e.g. {"KFC": -1, "HealthySalad": 10}
