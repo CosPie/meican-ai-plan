@@ -116,8 +116,16 @@ export class GeminiService {
     try {
       let rawText = '';
 
-      if (prefs.aiProvider === 'custom') {
-        rawText = await this.callCustomAI(prompt + "\n\nEnsure you return ONLY valid JSON. Keys must be double quoted.", prefs);
+      if (prefs.aiProvider === 'custom' || prefs.aiProvider === 'openrouter') {
+        const isOpenRouter = prefs.aiProvider === 'openrouter';
+        const customPrefs = isOpenRouter ? {
+          ...prefs,
+          customAiBaseUrl: 'https://openrouter.ai/api/v1',
+          customAiApiKey: 'OPENROUTER_MANAGED_KEY', // Backend will replace this
+          customAiModel: prefs.openRouterModel || 'nex-agi/deepseek-v3.1-nex-n1:free'
+        } : prefs;
+        
+        rawText = await this.callCustomAI(prompt + "\n\nEnsure you return ONLY valid JSON. Keys must be double quoted.", customPrefs);
       } else {
         // Prepare Gemini Client (Use user provided key if available, else generic)
         // Prepare Gemini Client (Use user provided key if available, else generic)
@@ -237,8 +245,16 @@ export class GeminiService {
     try {
       let rawText = '';
       
-      if (prefs && prefs.aiProvider === 'custom') {
-         rawText = await this.callCustomAI(prompt, prefs);
+      if (prefs && (prefs.aiProvider === 'custom' || prefs.aiProvider === 'openrouter')) {
+         const isOpenRouter = prefs.aiProvider === 'openrouter';
+         const customPrefs = isOpenRouter ? {
+           ...prefs,
+           customAiBaseUrl: 'https://openrouter.ai/api/v1',
+           customAiApiKey: 'OPENROUTER_MANAGED_KEY',
+           customAiModel: prefs.openRouterModel || 'nex-agi/deepseek-v3.1-nex-n1:free'
+         } : prefs;
+
+         rawText = await this.callCustomAI(prompt, customPrefs);
       } else {
         const activeGenAI = this.getGenAI(prefs?.geminiApiKey);
 
@@ -271,8 +287,8 @@ export class GeminiService {
       const result = JSON.parse(cleanText || "{}");
       
       // Attach the model name to the result
-      result.modelName = (prefs && prefs.aiProvider === 'custom') 
-        ? (prefs.customAiModel || 'Custom Model')
+      result.modelName = (prefs && (prefs.aiProvider === 'custom' || prefs.aiProvider === 'openrouter')) 
+        ? (prefs.aiProvider === 'openrouter' ? (prefs.openRouterModel || 'DeepSeek (Free)') : (prefs.customAiModel || 'Custom Model'))
         : 'gemini-2.5-flash';
 
       return result;

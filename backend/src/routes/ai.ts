@@ -14,8 +14,17 @@ ai.post('/chat', async (c) => {
     // Initialize OpenAI client with custom settings
     // Note: baseURL should be the base API URL (e.g., "https://api.openai.com/v1")
     // The SDK will automatically append "/chat/completions" for chat requests
+    
+    let finalApiKey = apiKey;
+    if (baseUrl.includes('openrouter.ai')) {
+      finalApiKey = process.env.OPENROUTER_API_KEY || '';
+      if (!finalApiKey) {
+        console.warn('[AI Proxy] OPENROUTER_API_KEY is not set in environment variables');
+      }
+    }
+
     const openai = new OpenAI({
-      apiKey: apiKey,
+      apiKey: finalApiKey,
       baseURL: baseUrl,
     });
 

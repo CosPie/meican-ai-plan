@@ -15,7 +15,17 @@ import { motion } from 'framer-motion';
 
 const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
   const { t, i18n } = useTranslation();
-  const [formData, setFormData] = useState<UserPreferences>(initialPrefs);
+  const [formData, setFormData] = useState<UserPreferences>(() => {
+    // Default to OpenRouter if no provider is set
+    if (!initialPrefs.aiProvider) {
+      return {
+        ...initialPrefs,
+        aiProvider: 'openrouter',
+        openRouterModel: 'nex-agi/deepseek-v3.1-nex-n1:free'
+      };
+    }
+    return initialPrefs;
+  });
   const [newVendor, setNewVendor] = useState('');
   const [newWeight, setNewWeight] = useState(0);
   const [loginError, setLoginError] = useState('');
@@ -330,8 +340,12 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
                   className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
                 >
                   <option value="gemini">{t('settings.geminiDefault')}</option>
+                  <option value="openrouter">OpenRouter (Free)</option>
                   <option value="custom">{t('settings.customAi')}</option>
                 </select>
+                {formData.aiProvider === 'openrouter' && (
+                  <p className="text-xs text-yellow-500 mt-1">Free But Not Stable</p>
+                )}
               </div>
 
               {formData.aiProvider === 'custom' ? (
@@ -367,6 +381,19 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
                     />
                   </div>
                 </>
+              ) : formData.aiProvider === 'openrouter' ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.modelName')}</label>
+                  <select 
+                    value={formData.openRouterModel || 'nex-agi/deepseek-v3.1-nex-n1:free'}
+                    onChange={(e) => handleChange('openRouterModel', e.target.value)}
+                    className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
+                  >
+                    <option value="nex-agi/deepseek-v3.1-nex-n1:free">DeepSeek V3.1 (Free)</option>
+                    <option value="qwen/qwen3-235b-a22b:free">Qwen 2.5 (Free)</option>
+                    <option value="moonshotai/kimi-k2:free">Kimi K2 (Free)</option>
+                  </select>
+                </div>
               ) : (
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.geminiApiKey')}</label>

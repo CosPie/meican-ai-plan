@@ -25,11 +25,12 @@ export interface UserPreferences {
   enableWeekends?: boolean; // Default false
   
   // AI Provider Config
-  aiProvider: 'gemini' | 'custom';
+  aiProvider: 'gemini' | 'custom' | 'openrouter';
   geminiApiKey?: string;
   customAiBaseUrl?: string; // e.g. https://api.openai.com/v1
   customAiApiKey?: string;
   customAiModel?: string; // e.g. gpt-4o
+  openRouterModel?: string; // e.g. nex-agi/deepseek-v3.1-nex-n1:free
 }
 
 export interface Dish {
