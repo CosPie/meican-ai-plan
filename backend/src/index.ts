@@ -98,4 +98,7 @@ if (!process.versions['bun']) {
   });
 }
 
-export default app;
+export default {
+  port,
+  fetch: app.fetch
+};

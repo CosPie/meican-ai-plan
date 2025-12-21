@@ -71,16 +71,14 @@ async function deploy() {
     // 4. Remote Install & Restart
     console.log('Installing dependencies and restarting backend...');
     
-    // Note: nvm use 16 might need sourcing nvm first. 
-    const nvmSource = 'source ~/.nvm/nvm.sh || source ~/.bashrc || source ~/.profile || true';
+    const bunSource = 'export PATH=$HOME/.bun/bin:$PATH';
     
     const remoteCommands = [
-      `${nvmSource}`,
-      `nvm use 16`,
+      `${bunSource}`,
       `cd ${remoteBackend}`,
       `npm install --production`, // Only install runtime dependencies
       `npm install -g pm2`,
-      `pm2 restart meican-backend || pm2 start dist/index.js --name meican-backend`
+      `pm2 restart meican-backend || pm2 start dist/index.js --name meican-backend --interpreter bun`
     ].join(' && ');
 
     const resultRemote = await ssh.execCommand(remoteCommands);
