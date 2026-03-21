@@ -150,30 +150,30 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
 
   if (!isModificationAllowed()) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       >
-        <motion.div 
+        <motion.div
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
           exit={{ scale: 0.9 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="bg-[#252525] rounded-3xl shadow-2xl p-8 w-full max-w-md border border-white/10"
+          className="bg-[#252525] rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md border border-white/10"
         >
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
-              <span className="text-3xl">⏰</span>
+            <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
+              <span className="text-2xl sm:text-3xl">⏰</span>
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">{t('orderEdit.deadlinePassed')}</h2>
-            <p className="text-gray-400 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-white mb-2">{t('orderEdit.deadlinePassed')}</h2>
+            <p className="text-sm sm:text-base text-gray-400 mb-6">
               {t('orderEdit.deadlineMessage', { time: slot.closeTime })}
             </p>
-            <button 
+            <button
               onClick={onClose}
-              className="px-6 py-2.5 bg-[#333] hover:bg-[#444] text-white rounded-full transition-colors"
+              className="min-h-touch px-6 py-2.5 bg-[#333] hover:bg-[#444] text-white rounded-full transition-colors tap-highlight-none"
             >
               {t('app.close')}
             </button>
@@ -184,32 +184,32 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4"
     >
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className="bg-[#252525] rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-white/10 overflow-hidden mx-4 md:mx-0"
+        className="bg-[#252525] rounded-none sm:rounded-3xl shadow-2xl w-full h-full sm:h-auto sm:max-w-2xl sm:max-h-[90vh] flex flex-col border-0 sm:border sm:border-white/10 overflow-hidden"
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-white/10">
+        <div className="flex justify-between items-center p-4 sm:p-6 border-b border-white/10">
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
               <span className="text-[#6FB92D]">✎</span> {t('orderEdit.modifyOrder')}
             </h2>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-xs sm:text-sm text-gray-400 mt-1">
               {formattedDate} · {mealTimeLabel}
             </p>
           </div>
-          <button 
-            onClick={onClose} 
-            className="text-gray-400 hover:text-white transition-colors text-xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10"
+          <button
+            onClick={onClose}
+            className="min-w-touch min-h-touch text-gray-400 hover:text-white transition-colors text-xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 tap-highlight-none"
           >
             ✕
           </button>
@@ -217,21 +217,21 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
 
         {/* Current Order Section */}
         {slot.currentOrder && (
-          <div className="px-6 py-4 bg-[#6FB92D]/10 border-b border-[#6FB92D]/20">
-            <div className="flex justify-between items-center">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 bg-[#6FB92D]/10 border-b border-[#6FB92D]/20">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
               <div>
                 <p className="text-xs text-gray-400 mb-1">{t('orderEdit.currentOrder')}</p>
-                <p className="text-[#6FB92D] font-bold">{slot.currentOrder.name}</p>
+                <p className="text-sm sm:text-base text-[#6FB92D] font-bold line-clamp-1">{slot.currentOrder.name}</p>
                 <p className="text-xs text-gray-500">{slot.currentOrder.restaurantName}</p>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-white font-mono">
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                <span className="text-white font-mono text-sm sm:text-base">
                   ¥{(slot.currentOrder.priceInCent / 100).toFixed(2)}
                 </span>
                 <button
                   onClick={handleDelete}
                   disabled={isActionLoading}
-                  className="px-4 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-full text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="min-h-touch px-3 sm:px-4 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-full text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 tap-highlight-none"
                 >
                   {deleteOrderMutation.isPending ? (
                     <>
@@ -248,14 +248,14 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
         )}
 
         {/* Search Bar */}
-        <div className="px-6 py-4 border-b border-white/5">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5">
           <div className="relative">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('orderEdit.searchPlaceholder')}
-              className="w-full bg-[#1e1e1e] border border-[#333] rounded-xl px-4 py-3 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-[#6FB92D]/50 transition-colors"
+              className="w-full min-h-touch bg-[#1e1e1e] border border-[#333] rounded-xl px-4 py-3 pl-10 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-[#6FB92D]/50 transition-colors"
             />
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">🔍</span>
           </div>
@@ -263,7 +263,7 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
 
         {/* Address Selection */}
         {addresses.length > 0 && (
-          <div className="px-6 py-4 border-b border-white/5">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5">
             <label className="block text-xs text-gray-400 mb-2">{t('orderEdit.deliveryAddress')}</label>
             <select
               value={selectedAddress?.uniqueId || ''}
@@ -271,7 +271,7 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
                 const addr = addresses.find(a => a.uniqueId === e.target.value);
                 setSelectedAddress(addr || null);
               }}
-              className="w-full bg-[#1e1e1e] border border-[#333] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#6FB92D]/50 transition-colors appearance-none cursor-pointer"
+              className="w-full min-h-touch bg-[#1e1e1e] border border-[#333] rounded-xl px-4 py-3 text-sm sm:text-base text-white focus:outline-none focus:border-[#6FB92D]/50 transition-colors appearance-none cursor-pointer tap-highlight-none"
             >
               {addresses.map((addr) => (
                 <option key={addr.uniqueId} value={addr.uniqueId}>
@@ -284,15 +284,15 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
 
         {/* Error Message */}
         {error && (
-          <div className="mx-6 mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center gap-2">
+          <div className="mx-4 sm:mx-6 mt-3 sm:mt-4 p-3 sm:p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs sm:text-sm flex items-center gap-2">
             <span>⚠️</span> {error}
           </div>
         )}
 
         {/* Dishes List */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 custom-scrollbar">
           {isLoading ? (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {[1, 2, 3].map(i => (
                 <div key={i}>
                   <div className="h-4 w-24 bg-[#333] rounded mb-3 animate-pulse"></div>
@@ -312,17 +312,17 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
             </div>
           ) : Object.keys(groupedDishes).length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto mb-4 bg-[#333] rounded-full flex items-center justify-center">
-                <span className="text-2xl">🍽️</span>
+              <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 bg-[#333] rounded-full flex items-center justify-center">
+                <span className="text-xl sm:text-2xl">🍽️</span>
               </div>
-              <p className="text-gray-400">
+              <p className="text-sm sm:text-base text-gray-400">
                 {searchQuery ? t('orderEdit.noMatchingDishes') : t('orderEdit.noAvailableDishes')}
               </p>
             </div>
           ) : (
             Object.entries(groupedDishes).map(([restaurant, restaurantDishes]) => (
               <div key={restaurant}>
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <h3 className="text-xs sm:text-sm font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                   <span className="w-2 h-2 bg-[#6FB92D] rounded-full"></span>
                   {restaurant}
                 </h3>
@@ -331,24 +331,24 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
                     <button
                       key={dish.id}
                       onClick={() => setSelectedDish(selectedDish?.id === dish.id ? null : dish)}
-                      className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                      className={`w-full min-h-touch text-left p-3 sm:p-4 rounded-xl border-2 transition-all tap-highlight-none ${
                         selectedDish?.id === dish.id
                           ? 'bg-[#6FB92D]/10 border-[#6FB92D] text-white'
                           : 'bg-[#1e1e1e] border-[#333] hover:border-[#555] text-gray-300'
                       }`}
                     >
-                      <div className="flex justify-between items-center">
-                          <div>
-                            <p className={`font-medium ${selectedDish?.id === dish.id ? 'text-[#6FB92D]' : ''} line-clamp-2`}>
+                      <div className="flex justify-between items-center gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className={`font-medium text-sm sm:text-base ${selectedDish?.id === dish.id ? 'text-[#6FB92D]' : ''} line-clamp-2`}>
                               {dish.name}
                             </p>
                           </div>
-                        <div className="flex items-center gap-3">
-                          <span className="font-mono text-white">
+                        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                          <span className="font-mono text-white text-sm sm:text-base">
                             ¥{(dish.priceInCent / 100).toFixed(2)}
                           </span>
                           {selectedDish?.id === dish.id && (
-                            <span className="w-6 h-6 bg-[#6FB92D] rounded-full flex items-center justify-center text-white text-sm">
+                            <span className="w-5 h-5 sm:w-6 sm:h-6 bg-[#6FB92D] rounded-full flex items-center justify-center text-white text-xs sm:text-sm">
                               ✓
                             </span>
                           )}
@@ -363,10 +363,10 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
         </div>
 
         {/* Footer */}
-        <div className="p-4 md:p-6 border-t border-white/10 flex flex-col-reverse sm:flex-row justify-between items-center bg-[#1e1e1e] gap-4 sm:gap-0">
+        <div className="p-4 sm:p-6 border-t border-white/10 flex flex-col-reverse sm:flex-row justify-between items-center bg-[#1e1e1e] gap-3 sm:gap-4">
           <div className="w-full sm:w-auto text-center sm:text-left">
             {selectedDish && (
-              <p className="text-sm text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-400 line-clamp-1">
                 {t('orderEdit.selected')}: <span className="text-[#6FB92D] font-medium">{selectedDish.name}</span>
               </p>
             )}
@@ -374,14 +374,14 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
           <div className="flex gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none px-6 py-2.5 text-gray-400 hover:text-white hover:bg-[#333] rounded-full transition-colors font-medium"
+              className="min-h-touch flex-1 sm:flex-none px-6 py-2.5 text-sm sm:text-base text-gray-400 hover:text-white hover:bg-[#333] rounded-full transition-colors font-medium tap-highlight-none"
             >
               {t('app.cancel')}
             </button>
             <button
               onClick={handleOrder}
               disabled={!selectedDish || isActionLoading}
-              className="flex-1 sm:flex-none px-6 py-2.5 bg-[#6FB92D] hover:bg-[#5da025] text-white rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all flex items-center justify-center gap-2"
+              className="min-h-touch flex-1 sm:flex-none px-6 py-2.5 text-sm sm:text-base bg-[#6FB92D] hover:bg-[#5da025] text-white rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all flex items-center justify-center gap-2 tap-highlight-none"
             >
               {placeOrderMutation.isPending ? (
                 <>

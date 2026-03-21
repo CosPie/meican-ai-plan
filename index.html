@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="theme-color" content="#181818" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Meican AI Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -37,6 +40,21 @@
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      /* Touch-friendly defaults */
+      @media (hover: none) and (pointer: coarse) {
+        button, a, input, select {
+          touch-action: manipulation;
+        }
+      }
+
+      /* Safe area insets for notched devices */
+      @supports (padding: env(safe-area-inset-top)) {
+        body {
+          padding-top: env(safe-area-inset-top);
+          padding-bottom: env(safe-area-inset-bottom);
+        }
       }
     </style>
   <script type="importmap">
