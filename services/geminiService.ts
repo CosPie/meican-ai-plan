@@ -131,7 +131,7 @@ export class GeminiService {
         // Prepare Gemini Client (Use user provided key if available, else generic)
         const activeGenAI = this.getGenAI(prefs.geminiApiKey);
 
-        const model = 'gemini-2.5-flash';
+        const model = 'gemini-3.1-flash-lite-preview';
         const response = await activeGenAI.models.generateContent({
           model,
           contents: prompt,
@@ -259,7 +259,7 @@ export class GeminiService {
         const activeGenAI = this.getGenAI(prefs?.geminiApiKey);
 
         const response = await activeGenAI.models.generateContent({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-3-flash-preview',
           contents: prompt,
           config: {
             responseMimeType: 'application/json'
@@ -289,7 +289,7 @@ export class GeminiService {
       // Attach the model name to the result
       result.modelName = (prefs && (prefs.aiProvider === 'custom' || prefs.aiProvider === 'openrouter')) 
         ? (prefs.aiProvider === 'openrouter' ? (prefs.openRouterModel || 'DeepSeek (Free)') : (prefs.customAiModel || 'Custom Model'))
-        : 'gemini-2.5-flash';
+        : 'gemini-3-flash-preview';
 
       return result;
     } catch (e) {
