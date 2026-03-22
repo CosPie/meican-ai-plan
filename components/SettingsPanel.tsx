@@ -88,6 +88,28 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
   
   const addresses = addressData?.addresses || [];
 
+  // Prevent scroll on body when modal is open
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    const originalPosition = window.getComputedStyle(document.body).position;
+    const scrollY = window.scrollY;
+
+    // Lock body scroll
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+
+    return () => {
+      // Restore body scroll
+      document.body.style.overflow = originalStyle;
+      document.body.style.position = originalPosition;
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
   // Effect to auto-select default address
   useEffect(() => {
     if (shouldLoadAddresses && addressData?.defaultAddressId && !formData.defaultAddressId) {
@@ -168,6 +190,18 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      onClick={(e) => {
+        // Close modal when clicking on backdrop
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+      onTouchMove={(e) => {
+        // Prevent scroll on backdrop
+        if (e.target === e.currentTarget) {
+          e.preventDefault();
+        }
+      }}
       className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4"
     >
       <motion.div

@@ -21,6 +21,19 @@ const AnalysisPanel: React.FC<Props> = ({ prefs, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(true);
 
+  // Prevent scroll on body when panel is open
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+
+    // Lock body scroll
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      // Restore body scroll
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
+
   useEffect(() => {
     setHistoryLoading(true);
     getOrderHistory(prefs)

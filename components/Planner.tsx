@@ -135,6 +135,28 @@ const Planner: React.FC<Props> = ({ weekStatus, prefs, onUpdatePrefs, onOrdersPl
   // Local state for AI Config
   const [configForm, setConfigForm] = useState<Partial<UserPreferences>>({});
 
+  // Prevent scroll on body when modal is open
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    const originalPosition = window.getComputedStyle(document.body).position;
+    const scrollY = window.scrollY;
+
+    // Lock body scroll
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+
+    return () => {
+      // Restore body scroll
+      document.body.style.overflow = originalStyle;
+      document.body.style.position = originalPosition;
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
   // Auto-switch between idle and fully_planned when slots change (e.g. via prefs)
   useEffect(() => {
       if (step === 'idle' && slotsToFill.length === 0) {
@@ -398,6 +420,18 @@ const Planner: React.FC<Props> = ({ weekStatus, prefs, onUpdatePrefs, onOrdersPl
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      onClick={(e) => {
+        // Close modal when clicking on backdrop during idle/fully_planned step
+        if (e.target === e.currentTarget && (step === 'idle' || step === 'fully_planned')) {
+          onCancel();
+        }
+      }}
+      onTouchMove={(e) => {
+        // Prevent scroll on backdrop
+        if (e.target === e.currentTarget) {
+          e.preventDefault();
+        }
+      }}
       className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4"
     >
       <motion.div
