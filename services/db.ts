@@ -2,9 +2,23 @@ import { HistoricalOrder, UserPreferences } from '../types';
 import { fetchOrderHistory } from './meicanService';
 
 const DB_NAME = 'MeicanAI_DB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Bumped version for migration
 const STORE_ORDERS = 'orders';
 const STORE_SETTINGS = 'settings';
+
+/**
+ * Migrate old preferences to new format with enhanced dietary preferences
+ */
+const migratePreferences = (oldPrefs: any): UserPreferences => {
+  return {
+    ...oldPrefs,
+    // Initialize new fields if they don't exist
+    dietaryRestrictions: oldPrefs.dietaryRestrictions || [],
+    favoriteIngredients: oldPrefs.favoriteIngredients || [],
+    allergens: oldPrefs.allergens || [],
+    cuisinePreferences: oldPrefs.cuisinePreferences || {},
+  };
+};
 
 export const initDB = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
@@ -107,6 +121,14 @@ export const getPreferences = async (): Promise<UserPreferences | null> => {
     const tx = db.transaction(STORE_SETTINGS, 'readonly');
     const store = tx.objectStore(STORE_SETTINGS);
     const request = store.get('user_prefs');
-    request.onsuccess = () => resolve(request.result ? (request.result as UserPreferences) : null);
+    request.onsuccess = () => {
+      if (request.result) {
+        // Migrate old preferences to new format
+        const migrated = migratePreferences(request.result);
+        resolve(migrated);
+      } else {
+        resolve(null);
+      }
+    };
   });
 };

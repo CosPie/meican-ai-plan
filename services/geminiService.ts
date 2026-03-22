@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { Dish, HistoricalOrder, UserPreferences, AnalysisResult, PlannedOrder, MealTime } from '../types';
+import { DIETARY_RESTRICTIONS, COMMON_ALLERGENS } from '../constants/dietaryPresets';
 
 export class GeminiService {
   private genAI: GoogleGenAI | undefined;
@@ -50,13 +51,56 @@ export class GeminiService {
     history: Omit<HistoricalOrder, 'id'>[],
     prefs: UserPreferences
   ): Promise<PlannedOrder[]> {
-    const modePrompt = prefs.planningMode === 'health' 
+    const modePrompt = prefs.planningMode === 'health'
       ? "Prioritize low calorie, high protein, and balanced macros."
       : prefs.planningMode === 'preference'
       ? "Prioritize favorite restaurants and similar dishes to history."
       : "Balance between health and taste variety.";
 
+    // Build comprehensive dietary constraints section
+    let dietaryConstraints = '';
+
+    // CRITICAL: Allergens (strictest exclusion)
+    if (prefs.allergens && prefs.allergens.length > 0) {
+      const allergenKeywords = prefs.allergens.flatMap(id => {
+        const allergen = COMMON_ALLERGENS.find(a => a.id === id);
+        return allergen ? allergen.keywords : [];
+      });
+      dietaryConstraints += `\n⚠️ CRITICAL ALLERGENS - MUST ABSOLUTELY AVOID: [${allergenKeywords.join(', ')}]`;
+    }
+
+    // Dietary Restrictions (strong exclusion)
+    if (prefs.dietaryRestrictions && prefs.dietaryRestrictions.length > 0) {
+      const restrictionKeywords = prefs.dietaryRestrictions.flatMap(id => {
+        const restriction = DIETARY_RESTRICTIONS.find(r => r.id === id);
+        return restriction ? restriction.keywords : [];
+      });
+      const restrictionLabels = prefs.dietaryRestrictions.map(id => {
+        const restriction = DIETARY_RESTRICTIONS.find(r => r.id === id);
+        return restriction ? `${restriction.label.en} (${restriction.label.zh})` : id;
+      }).join(', ');
+      dietaryConstraints += `\nDietary Restrictions: ${restrictionLabels}\n  Must avoid: [${restrictionKeywords.join(', ')}]`;
+    }
+
+    // Excluded keywords (user-specified exclusions)
     const exclusions = prefs.excludedKeywords.join(", ");
+    if (exclusions) {
+      dietaryConstraints += `\nAdditional Exclusions: [${exclusions}]`;
+    }
+
+    // Favorite ingredients (positive bias)
+    if (prefs.favoriteIngredients && prefs.favoriteIngredients.length > 0) {
+      dietaryConstraints += `\n✅ Preferred Ingredients (give priority): [${prefs.favoriteIngredients.join(', ')}]`;
+    }
+
+    // Cuisine preferences
+    if (prefs.cuisinePreferences && Object.keys(prefs.cuisinePreferences).length > 0) {
+      const cuisineList = Object.entries(prefs.cuisinePreferences)
+        .map(([cuisine, rating]) => `${cuisine}: ${rating}/10`)
+        .join(', ');
+      dietaryConstraints += `\nCuisine Preferences: ${cuisineList}`;
+    }
+
     const weights = JSON.stringify(prefs.vendorWeights);
 
     // Minimize token usage by mapping menus efficiently
@@ -76,31 +120,32 @@ export class GeminiService {
 
     const prompt = `
       You are an expert dietary planner with taste preference analysis capabilities.
-      
+
       ## STEP 1: Analyze User's Taste Profile (from order history)
-      
+
       Historical Orders (past 4 weeks):
       ${JSON.stringify(historyPayload)}
-      
+
       Based on this history, identify:
       1. Most frequently ordered dish types/ingredients (e.g., beef, chicken, fish, vegetarian)
       2. Favorite restaurants (ordered from most often)
       3. Cuisine preferences (Chinese, Western, Japanese, Korean, etc.)
       4. Typical price range
       5. Any patterns (e.g., prefers lighter meals, likes spicy food)
-      
+
       ## STEP 2: Select ONE dish for each time slot
-      
+
       Available Slots and Menus:
       ${JSON.stringify(slotsPayload)}
-      
+
       Constraints:
-      1. Exclude dishes with keywords: [${exclusions}].
-      2. Vendor Weights (Higher is better, negative is banned): ${weights}.
-      3. Mode: ${modePrompt}
-      4. Avoid repeating the same main ingredient twice in a row.
-      5. IMPORTANT: Prefer dishes that match the user's taste profile from Step 1.
-      
+      ${dietaryConstraints}
+      Vendor Weights (Higher is better, negative is banned): ${weights}.
+      Mode: ${modePrompt}
+      - Avoid repeating the same main ingredient twice in a row.
+      - IMPORTANT: Prefer dishes that match the user's taste profile from Step 1.
+      - CRITICAL: Strictly respect allergen exclusions above all other preferences.
+
       ## Output Format (Strict JSON Array ONLY)
       IMPORTANT: Return ONLY valid JSON. Keys must be double quoted.
       [

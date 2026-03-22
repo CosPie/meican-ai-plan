@@ -4,6 +4,7 @@ import { UserPreferences } from '../types';
 import { savePreferences } from '../services/db';
 import { useLogin, useLogout, useCalendarStatus, useUserAddresses, Address } from '../hooks/useMeican';
 import { getSettings, saveSettings } from '../services/meicanService';
+import DietaryPreferencesSection from './DietaryPreferencesSection';
 
 interface Props {
   initialPrefs: UserPreferences;
@@ -17,14 +18,20 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
   const { t, i18n } = useTranslation();
   const [formData, setFormData] = useState<UserPreferences>(() => {
     // Default to OpenRouter if no provider is set
-    if (!initialPrefs.aiProvider) {
-      return {
-        ...initialPrefs,
-        aiProvider: 'openrouter',
-        openRouterModel: 'nex-agi/deepseek-v3.1-nex-n1:free'
-      };
-    }
-    return initialPrefs;
+    const defaults: Partial<UserPreferences> = {
+      aiProvider: 'openrouter',
+      openRouterModel: 'nex-agi/deepseek-v3.1-nex-n1:free',
+      // Initialize new dietary preference fields
+      dietaryRestrictions: [],
+      favoriteIngredients: [],
+      allergens: [],
+      cuisinePreferences: {},
+    };
+
+    return {
+      ...defaults,
+      ...initialPrefs,
+    } as UserPreferences;
   });
   const [newVendor, setNewVendor] = useState('');
   const [newWeight, setNewWeight] = useState(0);
@@ -153,68 +160,57 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
     onClose();
   };
 
-  const addVendorWeight = () => {
-    if (newVendor) {
-      setFormData(prev => ({
-        ...prev,
-        vendorWeights: { ...prev.vendorWeights, [newVendor]: newWeight }
-      }));
-      setNewVendor('');
-      setNewWeight(0);
-    }
-  };
-
   const isLoggedIn = !!formData.sessionId;
   const isLoginLoading = loginMutation.isPending;
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4"
     >
-      <motion.div 
+      <motion.div
          initial={{ scale: 0.9, y: 20 }}
          animate={{ scale: 1, y: 0 }}
          exit={{ scale: 0.9, y: 20 }}
          transition={{ type: "spring", stiffness: 300, damping: 25 }}
-         className="bg-[#252525] rounded-3xl shadow-2xl p-4 md:p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/10"
+         className="bg-[#252525] rounded-none sm:rounded-3xl shadow-2xl p-4 sm:p-6 w-full sm:max-w-2xl h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto custom-scrollbar border-0 sm:border sm:border-white/10"
       >
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-white">{t('settings.title')}</h2>
-          <div className="flex items-center space-x-4">
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-white">{t('settings.title')}</h2>
+          <div className="flex items-center gap-3 sm:gap-4">
              <div className="flex bg-[#181818] rounded-lg p-1 border border-white/10">
-                <button 
+                <button
                   onClick={() => i18n.changeLanguage('en')}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${i18n.language.startsWith('en') ? 'bg-[#6FB92D] text-white' : 'text-gray-400 hover:text-white'}`}
+                  className={`min-h-touch min-w-touch px-4 py-2 sm:px-3 sm:py-1 rounded-md text-xs sm:text-sm font-medium transition-all tap-highlight-none ${i18n.language.startsWith('en') ? 'bg-[#6FB92D] text-white' : 'text-gray-400 hover:text-white'}`}
                 >
                   EN
                 </button>
-                <button 
+                <button
                   onClick={() => i18n.changeLanguage('zh')}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${i18n.language.startsWith('zh') ? 'bg-[#6FB92D] text-white' : 'text-gray-400 hover:text-white'}`}
+                  className={`min-h-touch min-w-touch px-4 py-2 sm:px-3 sm:py-1 rounded-md text-xs sm:text-sm font-medium transition-all tap-highlight-none ${i18n.language.startsWith('zh') ? 'bg-[#6FB92D] text-white' : 'text-gray-400 hover:text-white'}`}
                 >
                   中
                 </button>
              </div>
-             <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">✕</button>
+             <button onClick={onClose} className="min-h-touch min-w-touch w-10 h-10 sm:w-auto sm:h-auto flex items-center justify-center text-gray-400 hover:text-white transition-colors tap-highlight-none">✕</button>
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Connectivity */}
-          <div className="p-6 bg-[#2A2A2A] rounded-2xl border border-white/5">
-            <h3 className="font-semibold text-[#6FB92D] mb-4 flex items-center">
-              <span className="w-2 h-2 rounded-full bg-[#6FB92D] mr-2"></span> {t('settings.connectivity')}
+          <div className="p-4 sm:p-6 bg-[#2A2A2A] rounded-2xl border border-white/5">
+            <h3 className="font-semibold text-[#6FB92D] mb-3 sm:mb-4 flex items-center text-base sm:text-lg">
+              <span className="w-2.5 h-2.5 sm:w-2 sm:h-2 rounded-full bg-[#6FB92D] mr-2"></span> {t('settings.connectivity')}
             </h3>
             <div className="grid grid-cols-1 gap-4">
-              <label className="flex items-center space-x-3 cursor-pointer group">
-                <input 
-                  type="checkbox" 
+              <label className="flex items-center space-x-3 min-h-touch cursor-pointer group">
+                <input
+                  type="checkbox"
                   checked={formData.useMockData}
                   onChange={(e) => handleChange('useMockData', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-600 bg-[#333] text-[#6FB92D] focus:ring-[#6FB92D] focus:ring-offset-[#252525]"
+                  className="w-6 h-6 sm:w-5 sm:h-5 rounded border-gray-600 bg-[#333] text-[#6FB92D] focus:ring-[#6FB92D] focus:ring-offset-[#252525]"
                 />
                 <span className="text-sm text-gray-300 group-hover:text-white">{t('settings.useMockData')}</span>
               </label>
@@ -227,7 +223,7 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
                   {isLoggedIn ? (
                     <>
                       <div className="p-4 bg-[#6FB92D]/10 border border-[#6FB92D]/30 rounded-xl">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-0 sm:justify-between">
                           <div className="flex items-center space-x-2">
                             <div className="w-3 h-3 rounded-full bg-[#6FB92D] animate-pulse"></div>
                             <span className="text-[#6FB92D] font-medium">{t('settings.loggedIn')}</span>
@@ -235,7 +231,7 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
                           </div>
                           <button
                             onClick={handleLogout}
-                            className="px-4 py-1.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors"
+                            className="w-full sm:w-auto min-h-touch px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors tap-highlight-none"
                           >
                             {t('settings.logout')}
                           </button>
@@ -246,14 +242,14 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
                       <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.defaultAddress')}</label>
                         {addressLoading ? (
-                          <div className="w-full rounded-xl border border-[#444] bg-[#181818] p-3 text-sm text-gray-500">
+                          <div className="w-full min-h-touch rounded-xl border border-[#444] bg-[#181818] p-4 sm:p-3 text-base text-gray-500">
                             {t('settings.loadingAddresses')}
                           </div>
                         ) : addresses.length > 0 ? (
                           <select
                             value={formData.defaultAddressId || ''}
                             onChange={(e) => handleChange('defaultAddressId', e.target.value)}
-                            className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
+                            className="w-full min-h-touch rounded-xl border border-[#444] bg-[#181818] shadow-sm p-4 sm:p-3 text-base text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
                           >
                             <option value="">{t('settings.selectAddress')}</option>
                             {addresses.map((addr) => (
@@ -263,7 +259,7 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
                             ))}
                           </select>
                         ) : (
-                          <div className="w-full rounded-xl border border-[#444] bg-[#181818] p-3 text-sm text-gray-500 flex items-center justify-between">
+                          <div className="w-full min-h-touch rounded-xl border border-[#444] bg-[#181818] p-4 sm:p-3 text-base text-gray-500 flex items-center justify-between">
                             <span>{t('settings.addressNotFound')}</span>
                             <div className="text-[#6FB92D] text-xs">
                                {t('settings.autoFetched')}
@@ -278,11 +274,11 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
                       {/* Username */}
                       <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.username')}</label>
-                        <input 
+                        <input
                           type="text"
                           value={formData.username}
                           onChange={(e) => handleChange('username', e.target.value)}
-                          className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
+                          className="w-full min-h-touch rounded-xl border border-[#444] bg-[#181818] shadow-sm p-4 sm:p-3 text-base text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
                           placeholder={t('settings.usernamePlaceholder')}
                         />
                       </div>
@@ -290,11 +286,11 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
                       {/* Password */}
                       <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.password')}</label>
-                        <input 
+                        <input
                           type="password"
                           value={formData.password}
                           onChange={(e) => handleChange('password', e.target.value)}
-                          className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
+                          className="w-full min-h-touch rounded-xl border border-[#444] bg-[#181818] shadow-sm p-4 sm:p-3 text-base text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
                           placeholder={t('settings.passwordPlaceholder')}
                         />
                       </div>
@@ -310,7 +306,7 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
                       <button
                         onClick={handleLogin}
                         disabled={isLoginLoading}
-                        className={`w-full py-3 rounded-xl font-medium transition-all ${
+                        className={`w-full min-h-touch py-3 rounded-xl font-medium transition-all tap-highlight-none ${
                           isLoginLoading
                             ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                             : 'bg-[#6FB92D] text-white hover:bg-[#5da025] shadow-lg shadow-[#6FB92D]/20'
@@ -327,17 +323,17 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
           </div>
 
           {/* AI Configuration */}
-          <div className="p-6 bg-[#2A2A2A] rounded-2xl border border-white/5">
-            <h3 className="font-semibold text-[#6FB92D] mb-4 flex items-center">
-              <span className="w-2 h-2 rounded-full bg-[#6FB92D] mr-2"></span> {t('settings.aiConfig')}
+          <div className="p-4 sm:p-6 bg-[#2A2A2A] rounded-2xl border border-white/5">
+            <h3 className="font-semibold text-[#6FB92D] mb-3 sm:mb-4 flex items-center text-base sm:text-lg">
+              <span className="w-2.5 h-2.5 sm:w-2 sm:h-2 rounded-full bg-[#6FB92D] mr-2"></span> {t('settings.aiConfig')}
             </h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.aiProvider')}</label>
-                <select 
+                <select
                   value={formData.aiProvider || 'gemini'}
                   onChange={(e) => handleChange('aiProvider', e.target.value)}
-                  className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
+                  className="w-full min-h-touch rounded-xl border border-[#444] bg-[#181818] shadow-sm p-4 sm:p-3 text-base text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
                 >
                   <option value="gemini">{t('settings.geminiModel')}</option>
                   <option value="openrouter">OpenRouter (Free)</option>
@@ -352,31 +348,31 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.baseUrl')}</label>
-                    <input 
+                    <input
                       type="text"
                       value={formData.customAiBaseUrl || ''}
                       onChange={(e) => handleChange('customAiBaseUrl', e.target.value)}
-                      className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
+                      className="w-full min-h-touch rounded-xl border border-[#444] bg-[#181818] shadow-sm p-4 sm:p-3 text-base text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
                       placeholder="https://api.openai.com/v1"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.apiKey')}</label>
-                    <input 
+                    <input
                       type="password"
                       value={formData.customAiApiKey || ''}
                       onChange={(e) => handleChange('customAiApiKey', e.target.value)}
-                      className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
+                      className="w-full min-h-touch rounded-xl border border-[#444] bg-[#181818] shadow-sm p-4 sm:p-3 text-base text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
                       placeholder="sk-..."
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.modelName')}</label>
-                    <input 
+                    <input
                       type="text"
                       value={formData.customAiModel || ''}
                       onChange={(e) => handleChange('customAiModel', e.target.value)}
-                      className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
+                      className="w-full min-h-touch rounded-xl border border-[#444] bg-[#181818] shadow-sm p-4 sm:p-3 text-base text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
                       placeholder="gpt-4o"
                     />
                   </div>
@@ -384,10 +380,10 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
               ) : formData.aiProvider === 'openrouter' ? (
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.modelName')}</label>
-                  <select 
+                  <select
                     value={formData.openRouterModel || 'nex-agi/deepseek-v3.1-nex-n1:free'}
                     onChange={(e) => handleChange('openRouterModel', e.target.value)}
-                    className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
+                    className="w-full min-h-touch rounded-xl border border-[#444] bg-[#181818] shadow-sm p-4 sm:p-3 text-base text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
                   >
                     <option value="nex-agi/deepseek-v3.1-nex-n1:free">DeepSeek V3.1 (Free)</option>
                     <option value="qwen/qwen3-235b-a22b:free">Qwen 2.5 (Free)</option>
@@ -397,11 +393,11 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
               ) : (
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.geminiApiKey')}</label>
-                  <input 
+                  <input
                     type="password"
                     value={formData.geminiApiKey || ''}
                     onChange={(e) => handleChange('geminiApiKey', e.target.value)}
-                    className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
+                    className="w-full min-h-touch rounded-xl border border-[#444] bg-[#181818] shadow-sm p-4 sm:p-3 text-base text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
                     placeholder={t('settings.geminiApiKeyPlaceholder')}
                   />
                 </div>
@@ -409,97 +405,45 @@ const SettingsPanel: React.FC<Props> = ({ initialPrefs, onSave, onClose }) => {
             </div>
           </div>
 
-          {/* Preferences */}
-          <div className="p-6 bg-[#2A2A2A] rounded-2xl border border-white/5">
-            <h3 className="font-semibold text-[#6FB92D] mb-4 flex items-center">
-               <span className="w-2 h-2 rounded-full bg-[#6FB92D] mr-2"></span> {t('settings.dietaryPreferences')}
+          {/* Meal Planning Options */}
+          <div className="p-4 sm:p-6 bg-[#2A2A2A] rounded-2xl border border-white/5">
+            <h3 className="font-semibold text-[#6FB92D] mb-3 sm:mb-4 flex items-center text-base sm:text-lg">
+              <span className="w-2.5 h-2.5 sm:w-2 sm:h-2 rounded-full bg-[#6FB92D] mr-2"></span> {t('settings.mealPlanningOptions')}
             </h3>
             <div className="grid grid-cols-1 gap-4">
-              <div className="flex space-x-6">
-                <label className="flex items-center space-x-3 cursor-pointer group">
-                  <input 
-                    type="checkbox" 
+              <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-6">
+                <label className="flex items-center space-x-3 min-h-touch cursor-pointer group">
+                  <input
+                    type="checkbox"
                     checked={formData.enableBreakfast || false}
                     onChange={(e) => handleChange('enableBreakfast', e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-600 bg-[#333] text-[#6FB92D] focus:ring-[#6FB92D] focus:ring-offset-[#252525]"
+                    className="w-6 h-6 sm:w-5 sm:h-5 rounded border-gray-600 bg-[#333] text-[#6FB92D] focus:ring-[#6FB92D] focus:ring-offset-[#252525]"
                   />
                   <span className="text-sm text-gray-300 group-hover:text-white">{t('settings.includeBreakfast')}</span>
                 </label>
-                <label className="flex items-center space-x-3 cursor-pointer group">
-                  <input 
-                    type="checkbox" 
+                <label className="flex items-center space-x-3 min-h-touch cursor-pointer group">
+                  <input
+                    type="checkbox"
                     checked={formData.enableWeekends || false}
                     onChange={(e) => handleChange('enableWeekends', e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-600 bg-[#333] text-[#6FB92D] focus:ring-[#6FB92D] focus:ring-offset-[#252525]"
+                    className="w-6 h-6 sm:w-5 sm:h-5 rounded border-gray-600 bg-[#333] text-[#6FB92D] focus:ring-[#6FB92D] focus:ring-offset-[#252525]"
                   />
                   <span className="text-sm text-gray-300 group-hover:text-white">{t('settings.includeWeekends')}</span>
                 </label>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.planningMode')}</label>
-                <select 
-                  value={formData.planningMode}
-                  onChange={(e) => handleChange('planningMode', e.target.value)}
-                  className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
-                >
-                  <option value="balanced">{t('settings.modeBalanced')}</option>
-                  <option value="health">{t('settings.modeHealth')}</option>
-                  <option value="preference">{t('settings.modeTaste')}</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.excludedKeywords')}</label>
-                <input 
-                  type="text"
-                  value={formData.excludedKeywords.join(', ')}
-                  onChange={(e) => handleChange('excludedKeywords', e.target.value.split(',').map(s => s.trim()))}
-                  className="w-full rounded-xl border border-[#444] bg-[#181818] shadow-sm p-3 text-sm text-gray-300 focus:border-[#6FB92D] focus:ring-1 focus:ring-[#6FB92D] outline-none transition-all"
-                  placeholder="peanuts, cilantro, spicy"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">{t('settings.vendorWeights')}</label>
-                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-1 mb-3">
-                  <input 
-                    placeholder={t('settings.restaurantName')}
-                    value={newVendor}
-                    onChange={(e) => setNewVendor(e.target.value)}
-                    className="flex-1 rounded-xl border border-[#444] bg-[#181818] p-3 text-sm text-gray-300 focus:border-[#6FB92D] outline-none"
-                  />
-                  <input 
-                    type="number"
-                    placeholder={t('settings.score')}
-                    value={newWeight}
-                    onChange={(e) => setNewWeight(parseInt(e.target.value))}
-                    className="w-20 rounded-xl border border-[#444] bg-[#181818] p-3 text-sm text-gray-300 focus:border-[#6FB92D] outline-none"
-                  />
-                  <button onClick={addVendorWeight} className="bg-[#333] border border-[#444] hover:border-[#6FB92D] hover:text-[#6FB92D] text-gray-300 px-4 py-1 rounded-xl text-sm transition-colors">{t('settings.add')}</button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(formData.vendorWeights).map(([vendor, weight]) => (
-                    <span key={vendor} className="bg-[#181818] border border-[#333] px-3 py-1.5 rounded-lg text-xs flex items-center text-gray-300">
-                      {vendor} <span className={(weight as number) > 0 ? "text-[#6FB92D] ml-1.5 font-bold" : "text-red-500 ml-1.5 font-bold"}>{weight as number}</span>
-                      <button 
-                        onClick={() => {
-                          const newW = {...formData.vendorWeights};
-                          delete newW[vendor];
-                          handleChange('vendorWeights', newW);
-                        }}
-                        className="ml-2 text-gray-500 hover:text-red-400 text-lg leading-none"
-                      >×</button>
-                    </span>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
+
+          {/* Dietary Preferences Section - NEW COMPONENT */}
+          <DietaryPreferencesSection
+            preferences={formData}
+            onChange={handleChange}
+          />
         </div>
 
-        <div className="mt-8 flex flex-col-reverse sm:flex-row justify-end gap-4 sm:space-x-4">
-          <button onClick={onClose} className="w-full sm:w-auto px-6 py-2.5 rounded-full text-gray-400 hover:bg-[#333] transition-colors font-medium">{t('settings.cancel')}</button>
-          <button onClick={handleSave} className="w-full sm:w-auto px-8 py-2.5 bg-[#6FB92D] text-white rounded-full hover:bg-[#5da025] shadow-lg shadow-[#6FB92D]/20 transition-all font-medium">{t('settings.save')}</button>
+        <div className="mt-6 sm:mt-8 flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4">
+          <button onClick={onClose} className="w-full sm:w-auto min-h-touch px-6 py-3 sm:py-2.5 rounded-full text-gray-400 hover:bg-[#333] transition-colors font-medium tap-highlight-none">{t('settings.cancel')}</button>
+          <button onClick={handleSave} className="w-full sm:w-auto min-h-touch px-8 py-3 sm:py-2.5 bg-[#6FB92D] text-white rounded-full hover:bg-[#5da025] shadow-lg shadow-[#6FB92D]/20 transition-all font-medium tap-highlight-none">{t('settings.save')}</button>
         </div>
       </motion.div>
     </motion.div>

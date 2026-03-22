@@ -11,6 +11,12 @@ export enum OrderStatus {
   NO_SERVICE = 'NO_SERVICE'
 }
 
+export interface DietaryRestriction {
+  id: string;
+  label: { en: string; zh: string };
+  keywords: string[]; // Auto-excluded keywords
+}
+
 export interface UserPreferences {
   username: string;
   password: string;
@@ -23,7 +29,7 @@ export interface UserPreferences {
   defaultAddressId?: string; // Selected default delivery address ID
   enableBreakfast?: boolean; // Default false
   enableWeekends?: boolean; // Default false
-  
+
   // AI Provider Config
   aiProvider: 'gemini' | 'custom' | 'openrouter';
   geminiApiKey?: string;
@@ -31,6 +37,12 @@ export interface UserPreferences {
   customAiApiKey?: string;
   customAiModel?: string; // e.g. gpt-4o
   openRouterModel?: string; // e.g. nex-agi/deepseek-v3.1-nex-n1:free
+
+  // Enhanced Dietary Preferences
+  dietaryRestrictions?: string[]; // IDs of selected dietary restrictions (e.g., ["vegetarian", "halal"])
+  favoriteIngredients?: string[]; // Ingredients to prefer (e.g., ["chicken", "broccoli"])
+  allergens?: string[]; // Strict allergen exclusions (e.g., ["peanuts", "shellfish"])
+  cuisinePreferences?: Record<string, number>; // Cuisine ratings 0-10 (e.g., {"japanese": 8, "italian": 5})
 }
 
 export interface Dish {
