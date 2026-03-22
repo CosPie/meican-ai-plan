@@ -14,7 +14,8 @@
         "ordered": "已预订",
         "close": "关闭",
         "cancel": "取消",
-        "confirm": "确认"
+        "confirm": "确认",
+        "today": "今日"
     },
     "analysis": {
         "titlePrefix": "膳食",

@@ -14,7 +14,8 @@
         "ordered": "Ordered",
         "close": "Close",
         "cancel": "Cancel",
-        "confirm": "Confirm"
+        "confirm": "Confirm",
+        "today": "Today"
     },
     "analysis": {
         "titlePrefix": "Dietary",

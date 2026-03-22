@@ -283,9 +283,93 @@ const App: React.FC = () => {
                 </motion.button>
               </div>
 
+              {/* Mobile Timeline Layout */}
+              <div className="sm:hidden flex flex-col gap-2">
+                {(prefs.enableWeekends
+                  ? ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+                  : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+                ).map((dayKey, idx) => {
+                  const dayName = t(`days.${dayKey}`);
+                  const d = new Date(currentWeekStart);
+                  const day = d.getDay();
+                  const diff = d.getDate() - day + (day === 0 ? -6 : 1) + idx;
+                  d.setDate(diff);
+                  const dateStr = formatDate(d);
+
+                  const dayItems = weekStatus.filter(w => w.date === dateStr);
+                  const isToday = formatDate(new Date()) === dateStr;
+
+                  const mealsToShow = [];
+                  if (prefs.enableBreakfast) mealsToShow.push({ id: 'BREAKFAST', label: t('meals.breakfast'), color: 'bg-orange-500', text: 'text-orange-400' });
+                  mealsToShow.push({ id: 'LUNCH', label: t('meals.lunch'), color: 'bg-[#6FB92D]', text: 'text-[#6FB92D]' });
+                  mealsToShow.push({ id: 'DINNER', label: t('meals.dinner'), color: 'bg-indigo-500', text: 'text-indigo-400' });
+
+                  return (
+                    <div
+                      key={dayKey}
+                      className={`glass-panel rounded-xl overflow-hidden ${isToday ? 'ring-2 ring-[#6FB92D] ring-offset-2 ring-offset-[#181818]' : ''}`}
+                    >
+                      {/* Day header */}
+                      <div className="px-4 py-2.5 bg-[#2A2A2A]/50 flex items-center gap-2 border-b border-white/5">
+                        <span className={`font-bold text-sm ${isToday ? 'text-[#6FB92D]' : 'text-gray-300'}`}>{dayName}</span>
+                        <span className="text-xs text-gray-500">{d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                        {isToday && (
+                          <span className="ml-auto text-[10px] bg-[#6FB92D]/20 text-[#6FB92D] px-2 py-0.5 rounded-full font-medium border border-[#6FB92D]/30">
+                            {t('app.today')}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Meal rows */}
+                      {mealsToShow.map(meal => {
+                        const mealItem = dayItems.find(i => i.mealTime === meal.id);
+                        const isOrdered = mealItem?.status === OrderStatus.ORDERED;
+                        const slotKey = mealItem ? `${mealItem.date}-${mealItem.mealTime}` : '';
+                        const isSlotLoading = isLoading || (isFetching && loadingSlotId === slotKey);
+                        const editable = canEditSlot(mealItem);
+
+                        return (
+                          <button
+                            key={meal.id}
+                            onClick={() => mealItem && editable && setEditingSlot(mealItem)}
+                            disabled={isSlotLoading || !mealItem || !editable}
+                            className={`w-full flex items-center px-4 py-3 border-t border-white/5 min-h-[52px] text-left transition-colors tap-highlight-none no-select ${
+                              editable && !isSlotLoading ? 'active:bg-white/5' : ''
+                            }`}
+                          >
+                            <span className={`text-[11px] font-bold w-5 shrink-0 ${meal.text}`}>
+                              {meal.label.charAt(0)}
+                            </span>
+                            <div className="flex-1 min-w-0 ml-3">
+                              {isSlotLoading ? (
+                                <MealSkeleton color={`${meal.color}/30`} />
+                              ) : isOrdered ? (
+                                <>
+                                  <div className={`text-sm font-medium ${meal.text} truncate`}>{mealItem.currentOrder?.name || t('app.ordered')}</div>
+                                  <div className="text-xs text-gray-500 truncate">{mealItem.currentOrder?.restaurantName}</div>
+                                </>
+                              ) : !editable ? (
+                                <span className="text-sm text-gray-600">{t('app.orderClosed')}</span>
+                              ) : (
+                                <span className="text-sm text-gray-600">{t('app.clickToOrder')}</span>
+                              )}
+                            </div>
+                            {editable && !isSlotLoading && (
+                              <svg className="w-4 h-4 text-gray-600 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+
               {/* Calendar Grid */}
               <motion.div
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6"
+                className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6"
                 initial="hidden"
                 animate="visible"
                 variants={{
