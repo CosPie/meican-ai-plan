@@ -16,6 +16,20 @@ export default defineConfig(({ mode }) => {
         }
       },
       plugins: [react()],
+      build: {
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              'vendor-react': ['react', 'react-dom'],
+              'vendor-query': ['@tanstack/react-query'],
+              'vendor-motion': ['framer-motion'],
+              'vendor-charts': ['recharts'],
+              'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+              'vendor-genai': ['@google/genai'],
+            },
+          },
+        },
+      },
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)

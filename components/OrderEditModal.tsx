@@ -261,70 +261,66 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
 
         {/* Current Order Section */}
         {slot.currentOrder && (
-          <div className="px-4 sm:px-6 py-3 sm:py-4 bg-[#6FB92D]/10 border-b border-[#6FB92D]/20">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
-              <div>
-                <p className="text-xs text-gray-400 mb-1">{t('orderEdit.currentOrder')}</p>
-                <p className="text-sm sm:text-base text-[#6FB92D] font-bold line-clamp-1">{slot.currentOrder.name}</p>
-                <p className="text-xs text-gray-500">{slot.currentOrder.restaurantName}</p>
+          <div className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[#6FB92D]/10 border-b border-[#6FB92D]/20 flex justify-between items-center gap-2">
+            <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 overflow-hidden text-sm">
+              <div className="flex items-center gap-1.5 overflow-hidden">
+                <span className="text-xs text-[#6FB92D]/80 shrink-0">{t('orderEdit.currentOrder')}:</span>
+                <span className="text-[#6FB92D] font-bold truncate">{slot.currentOrder.name}</span>
               </div>
-              <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-                <span className="text-white font-mono text-sm sm:text-base">
-                  ¥{(slot.currentOrder.priceInCent / 100).toFixed(2)}
-                </span>
-                <button
-                  onClick={handleDelete}
-                  disabled={isActionLoading}
-                  className="min-h-touch px-3 sm:px-4 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-full text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 tap-highlight-none"
-                >
-                  {deleteOrderMutation.isPending ? (
-                    <>
-                      <span className="animate-spin">⏳</span>
-                      {t('orderEdit.deleting')}
-                    </>
-                  ) : (
-                    <>{t('orderEdit.deleteOrder')}</>
-                  )}
-                </button>
+              <div className="flex items-center gap-2 text-xs text-gray-400">
+                <span className="truncate max-w-[120px] sm:max-w-none">{slot.currentOrder.restaurantName}</span>
+                <span className="text-[#6FB92D] font-mono shrink-0">¥{(slot.currentOrder.priceInCent / 100).toFixed(2)}</span>
               </div>
             </div>
+            <button
+              onClick={handleDelete}
+              disabled={isActionLoading}
+              className="px-2.5 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1 shrink-0 tap-highlight-none"
+            >
+              {deleteOrderMutation.isPending ? (
+                <span className="animate-spin">⏳</span>
+              ) : (
+                <>🗑️ <span className="hidden sm:inline">{t('orderEdit.deleteOrder')}</span></>
+              )}
+            </button>
           </div>
         )}
 
-        {/* Search Bar */}
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5">
-          <div className="relative">
+        {/* Filters Section (Search & Address) */}
+        <div className="px-4 sm:px-6 py-2 sm:py-2.5 border-b border-white/5 flex gap-2 items-center bg-[#1e1e1e]/30">
+          <div className="relative flex-1">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('orderEdit.searchPlaceholder')}
-              className="w-full min-h-touch bg-[#1e1e1e] border border-[#333] rounded-xl px-4 py-3 pl-10 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-[#6FB92D]/50 transition-colors"
+              className="w-full bg-[#1e1e1e] border border-[#333] rounded-lg px-3 py-1.5 pl-8 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#6FB92D]/50 transition-colors"
             />
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">🔍</span>
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs shadow-none">🔍</span>
           </div>
+          {addresses.length > 0 && (
+            <div className="relative shrink-0 max-w-[140px] sm:max-w-[200px]">
+              <select
+                value={selectedAddress?.uniqueId || ''}
+                onChange={(e) => {
+                  const addr = addresses.find(a => a.uniqueId === e.target.value);
+                  setSelectedAddress(addr || null);
+                }}
+                className="w-full bg-[#1e1e1e] border border-[#333] rounded-lg pl-7 pr-6 py-1.5 text-sm text-gray-300 focus:outline-none focus:border-[#6FB92D]/50 transition-colors appearance-none cursor-pointer tap-highlight-none truncate"
+              >
+                {addresses.map((addr) => (
+                  <option key={addr.uniqueId} value={addr.uniqueId}>
+                    {addr.name}
+                  </option>
+                ))}
+              </select>
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs">📍</span>
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 text-[10px]">
+                ▼
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Address Selection */}
-        {addresses.length > 0 && (
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5">
-            <label className="block text-xs text-gray-400 mb-2">{t('orderEdit.deliveryAddress')}</label>
-            <select
-              value={selectedAddress?.uniqueId || ''}
-              onChange={(e) => {
-                const addr = addresses.find(a => a.uniqueId === e.target.value);
-                setSelectedAddress(addr || null);
-              }}
-              className="w-full min-h-touch bg-[#1e1e1e] border border-[#333] rounded-xl px-4 py-3 text-sm sm:text-base text-white focus:outline-none focus:border-[#6FB92D]/50 transition-colors appearance-none cursor-pointer tap-highlight-none"
-            >
-              {addresses.map((addr) => (
-                <option key={addr.uniqueId} value={addr.uniqueId}>
-                  📍 {addr.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
 
         {/* Error Message */}
         {error && (
@@ -334,9 +330,9 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
         )}
 
         {/* Dishes List */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 sm:pb-6 space-y-4 sm:space-y-6 custom-scrollbar relative">
           {isLoading ? (
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-4 sm:space-y-6 pt-4 sm:pt-6">
               {[1, 2, 3].map(i => (
                 <div key={i}>
                   <div className="h-4 w-24 bg-[#333] rounded mb-3 animate-pulse"></div>
@@ -366,7 +362,7 @@ const OrderEditModal: React.FC<Props> = ({ slot, prefs, onClose, onOrderUpdated 
           ) : (
             Object.entries(groupedDishes).map(([restaurant, restaurantDishes]) => (
               <div key={restaurant}>
-                <h3 className="text-xs sm:text-sm font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <h3 className="sticky top-0 z-10 bg-[#252525]/95 backdrop-blur-md pt-4 sm:pt-5 pb-2 mb-2 -mx-2 px-2 rounded-b-xl text-xs sm:text-sm font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
                   <span className="w-2 h-2 bg-[#6FB92D] rounded-full"></span>
                   {restaurant}
                 </h3>
